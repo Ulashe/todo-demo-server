@@ -7,21 +7,15 @@ const morgan = require("morgan");
 
 dotenv.config();
 
-mongoose.connect(
-  process.env.DB_CONNECT,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-  },
-  () => console.log("connected to db!")
-);
+mongoose.connect(process.env.DB_CONNECT, () => console.log("connected to db!"));
 
 mongoose.set("debug", true);
 
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors({ exposedHeaders: "Content-Range,X-Content-Range" }));
+
+app.use("/api/auth", require("./routes/authentication"));
 
 app.use((req, res, next) => {
   const error = new Error("Not found!");

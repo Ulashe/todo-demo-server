@@ -1,0 +1,24 @@
+###
+POST http://localhost:3100/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "User First",
+  "email": "user1@gmail.com",
+  "password": "asdqwe123"
+}
+
+###
+POST http://localhost:3100/api/auth/signin
+Content-Type: application/json
+
+{
+  "email": "user1@gmail.com",
+  "password": "asdqwe123"
+}
+
+###
+GET http://localhost:3100/api/auth/accesstoken/618d888461e8e1af17e5eaae
+
+# user1 refresh = 618d888461e8e1af17e5eaae
+# user1 access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MThkODg4NDYxZThlMWFmMTdlNWVhYWMiLCJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImlhdCI6MTYzNjY2NTQ3NiwiZXhwIjoxNjQxODQ5NDc2fQ.v9jWHQGOyhV3qkdbIa52PAzsVpDEXiPFoeom2b8z6Lg
