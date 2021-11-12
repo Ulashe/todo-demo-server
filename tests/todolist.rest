@@ -1,0 +1,100 @@
+### 
+# Get all todolists by user.
+GET {{local}}
+Authorization: {{accessToken}}
+
+### 
+# Get a specific todolist by id.
+GET {{endpoint}}/618ea2a95ae511293c7040e9
+Authorization: {{accessToken}}
+
+### 
+# Create a todolist.
+POST {{endpoint}}
+Authorization: {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Kıyafet alışverisi",
+  "todos": [
+    { "text": "Pantolon" },
+    { "text": "Tişört" },
+    { "text": "Gömlek" },
+    { "text": "Bot" },
+    { "text": "Çorap" }
+  ]
+}
+
+###
+# Add a todo to the end of the todo list.
+# The parameter is the id of the todolist.
+POST {{endpoint}}/addto/618ea2a95ae511293c7040e9
+Authorization: {{accessToken}}
+Content-Type: application/json
+
+{
+  "text": "Peynir"
+}
+
+### 
+# Update a todolist by the todolist's id.
+# Write only the fields need to be updated.
+# These values overwrite previous values.
+# If the field is an object or an array, remember to keep its previous values if needed.
+PATCH {{endpoint}}/618ea2a95ae511293c7040e9
+Authorization: {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Alışveriş listesi",
+  "todos": [
+    {
+      "isCompleted": false,
+      "_id": "618e9ca25ae511293c7040da",
+      "text": "Süt"
+    },
+    {
+      "isCompleted": false,
+      "_id": "618e9ca25ae511293c7040db",
+      "text": "Yumurta"
+    },
+    {
+      "isCompleted": true,
+      "_id": "618e9ca25ae511293c7040dc",
+      "text": "Un"
+    },
+    {
+      "isCompleted": true,
+      "_id": "618e9ca25ae511293c7040dd",
+      "text": "Ekmek"
+    },
+    {
+      "isCompleted": true,
+      "_id": "618ea321586a712124149cb4",
+      "text": "Kahve"
+    }
+  ]
+}
+
+###
+# Delete a todolist by the todolist's id.
+DELETE {{endpoint}}/618e9ca25ae511293c7040d9
+Authorization: {{accessToken}}
+
+###
+# Delete a todo from a todolist.
+# The first param is the id of the todolis.
+# The second param is the selector for the todo.
+# If the second parameter is a number, the todo with the same index as that number will be deleted.
+# if the second parameter is a string, the todo with the same id as that string will be deleted.
+DELETE {{endpoint}}/from/618ea2a95ae511293c7040e9/2
+Authorization: {{accessToken}}
+
+###
+@local = http://localhost:3100/api/todolists
+@endpoint = {{local}}
+@accessToken = {{user1}}
+
+###
+@user1refresh = 618d888461e8e1af17e5eaae
+@user1 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MThkODg4NDYxZThlMWFmMTdlNWVhYWMiLCJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImlhdCI6MTYzNjY2NTQ3NiwiZXhwIjoxNjQxODQ5NDc2fQ.v9jWHQGOyhV3qkdbIa52PAzsVpDEXiPFoeom2b8z6Lg
