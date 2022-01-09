@@ -14,11 +14,14 @@ Content-Type: application/json
 
 {
   "email": "user1@gmail.com",
-  "password": "asdqwe123"
+  "password": "qwe123"
 }
+
+###
+DELETE http://localhost:3100/api/auth/refreshtokens/61da0950ba03090ad0165f12
 
 ###
 GET http://localhost:3100/api/auth/accesstoken/618d888461e8e1af17e5eaae
 
-# user1 refresh = 618d888461e8e1af17e5eaae
-# user1 access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MThkODg4NDYxZThlMWFmMTdlNWVhYWMiLCJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImlhdCI6MTYzNjY2NTQ3NiwiZXhwIjoxNjQxODQ5NDc2fQ.v9jWHQGOyhV3qkdbIa52PAzsVpDEXiPFoeom2b8z6Lg
+# user1 refresh = 61da09f16e023027ecea7fcd
+# user1 access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWQ0MmIyMWRlNmViYjIyYThmZmY3ODYiLCJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImlhdCI6MTY0MTY3OTM0NSwiZXhwIjoxNjQxOTM4NTQ1fQ.DsdUY33vGpTfHiJQmAa0xOyNUDIbVF5LWRsouzHdUl0

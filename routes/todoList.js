@@ -39,7 +39,7 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/addto/:id", verifyToken, async (req, res) => {
+router.post("/:id/todo", verifyToken, async (req, res) => {
   try {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
@@ -76,13 +76,37 @@ router.patch("/:id", verifyToken, async (req, res) => {
   }
 });
 
+router.patch("/:id/todo", verifyToken, async (req, res) => {
+  try {
+    const todoList = await TodoList.findById(req.params.id);
+    if (todoList) {
+      if (todoList.user == req.user._id) {
+        const index = todoList.todos.findIndex((todo) => todo._id == req.body.todo._id);
+        if (index + 1) {
+          todoList.todos[index] = req.body.todo;
+          await todoList.save();
+          res.status(200).json(todoList);
+        } else {
+          res.status(404).json({ message: "Todo not found." });
+        }
+      } else {
+        res.status(403).json({ message: "Not allowed." });
+      }
+    } else {
+      res.status(404).json({ message: "Not found." });
+    }
+  } catch (error) {
+    res.status(400).json({ name: error.name, message: error.message });
+  }
+});
+
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
       if (todoList.user == req.user._id) {
         await todoList.deleteOne();
-        res.status(204).json({ message: "Deleted successfully." });
+        res.status(204).json();
       } else {
         res.status(403).json({ messge: "Not allowed." });
       }
@@ -94,16 +118,12 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-router.delete("/from/:id/:todo", verifyToken, async (req, res) => {
+router.delete("/:id/todo", verifyToken, async (req, res) => {
   try {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
       if (todoList.user == req.user._id) {
-        if (isNaN(req.params.todo)) {
-          todoList.todos = todoList.todos.filter((item) => item._id != req.params.todo);
-        } else {
-          todoList.todos.splice(req.params.todo, 1);
-        }
+        todoList.todos = todoList.todos.filter((todo) => todo._id != req.body.todo._id);
         await todoList.save();
         res.status(200).json(todoList);
       } else {

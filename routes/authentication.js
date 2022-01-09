@@ -4,7 +4,7 @@ const RefreshToken = require("../models/RefreshToken");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const expiresInSeconds = 60 * 120;
+const expiresInSeconds = 60 * 2;
 
 // Sign Up
 router.post("/signup", async (req, res) => {
