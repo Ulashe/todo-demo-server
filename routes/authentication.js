@@ -95,7 +95,7 @@ router.get("/accesstoken/:id", async (req, res) => {
       const accessToken = jwt.sign(token.jwtPayload, process.env.TOKEN_SECRET, {
         expiresIn: expiresInSeconds,
       });
-      res.status(200).json(accessToken);
+      res.status(200).json({ accessToken, expiresInSeconds });
     } else {
       res.status(401).json({ message: "The refresh token is invalid " });
     }
