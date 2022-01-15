@@ -19,7 +19,6 @@ router.post("/signup", async (req, res) => {
 
     // Create new user
     const user = new User({
-      name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
     });
@@ -39,7 +38,6 @@ router.post("/signup", async (req, res) => {
 
     res.status(200).json({
       _id: user._id,
-      name: user.name,
       email: user.email,
       expiresInSeconds: expiresInSeconds,
       accessToken: accessToken,
@@ -77,7 +75,6 @@ router.post("/signin", async (req, res) => {
 
     res.status(200).json({
       _id: user._id,
-      name: user.name,
       email: user.email,
       expiresInSeconds: expiresInSeconds,
       accessToken: accessToken,
