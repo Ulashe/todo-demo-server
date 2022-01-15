@@ -6,12 +6,29 @@ const jwt = require("jsonwebtoken");
 
 const expiresInSeconds = 60 * 2;
 
+const errors = [
+  { code: 1, field: "email", reason: "Email is invalid." },
+  { code: 2, field: "email", reason: "Email already exists." },
+  { code: 3, field: "email", reason: "Email not found." },
+  { code: 4, field: "password", reason: "Password is invalid, must be at least 6 digits." },
+  { code: 5, field: "password", reason: "Password is wrong." },
+];
+
 // Sign Up
 router.post("/signup", async (req, res) => {
   try {
+    // Check if the email is valid
+    const emailRegex = new RegExp(
+      /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
+    );
+    if (!emailRegex.test(req.body.email)) return res.status(422).json({ errors, code: 1 });
+
     // Check if the user is already in the database
     const emailExist = await User.findOne({ email: req.body.email });
-    if (emailExist) return res.status(200).json({ error: "Email is already exists" });
+    if (emailExist) return res.status(422).json({ errors, code: 2 });
+
+    // Check if the password is at least 6 characters
+    if (req.body.password.length < 6) return res.status(422).json({ errors, code: 4 });
 
     // Hash passwords
     const salt = await bcrypt.genSalt();
@@ -51,13 +68,22 @@ router.post("/signup", async (req, res) => {
 // Sign In
 router.post("/signin", async (req, res) => {
   try {
+    // Check if the email is valid
+    const emailRegex = new RegExp(
+      /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
+    );
+    if (!emailRegex.test(req.body.email)) return res.status(422).json({ errors, code: 1 });
+
     // Check if the email exists
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(200).json({ error: "Email doesn't exist" });
+    if (!user) return res.status(422).json({ errors, code: 3 });
+
+    // Check if the password is at least 6 characters
+    if (req.body.password.length < 6) return res.status(422).json({ errors, code: 4 });
 
     // Check if the password is correct
     const validPasword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPasword) return res.status(200).json({ error: "Invalid password" });
+    if (!validPasword) return res.status(422).json({ errors, code: 5 });
 
     const jwtPayload = { _id: user._id, email: user.email };
 
