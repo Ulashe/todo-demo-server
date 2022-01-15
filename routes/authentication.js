@@ -3,6 +3,7 @@ const User = require("../models/User");
 const RefreshToken = require("../models/RefreshToken");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const ac = require("../helpers/accessControl");
 
 const expiresInSeconds = 60 * 2;
 
@@ -12,6 +13,7 @@ const errors = [
   { code: 3, field: "email", reason: "Email not found." },
   { code: 4, field: "password", reason: "Password is invalid, must be at least 6 digits." },
   { code: 5, field: "password", reason: "Password is wrong." },
+  { code: 6, field: "newPassword", reason: "New password is invalid, must be at least 6 digits." },
 ];
 
 // Sign Up
@@ -140,6 +142,32 @@ router.delete("/refreshtokens/:id", async (req, res) => {
   try {
     await RefreshToken.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Refresh Token deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ name: error.name, message: error.message });
+  }
+});
+
+router.post("/changepassword", ac.verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (req.body.password.length < 6) return res.status(422).json({ errors, code: 4 });
+    if (req.body.newPassword.length < 6) return res.status(422).json({ errors, code: 6 });
+
+    const validPasword = await bcrypt.compare(req.body.password, user.password);
+    if (!validPasword) return res.status(422).json({ errors, code: 5 });
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    await RefreshToken.deleteMany({ user: user._id, _id: { $ne: req.body.refreshToken } });
+
+    res.status(200).json({
+      message:
+        "Password changed successfully. Except for this client's refreshToken, all other refreshTokens belong to the user deleted. This means that all sessions other than this session closed.",
+    });
   } catch (error) {
     res.status(400).json({ name: error.name, message: error.message });
   }
