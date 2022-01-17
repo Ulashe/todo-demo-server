@@ -44,9 +44,13 @@ router.post("/:id/todo", verifyToken, async (req, res) => {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
       if (todoList.user == req.user._id) {
-        todoList.todos.push({ text: req.body.text });
-        await todoList.save();
-        res.status(200).json(todoList);
+        if (req.body.text.length > 0) {
+          todoList.todos.push({ text: req.body.text });
+          await todoList.save();
+          res.status(200).json(todoList);
+        } else {
+          res.status(422).json({ message: "Text cannot be empty!" });
+        }
       } else {
         res.status(403).json({ message: "Not allowed." });
       }
@@ -63,8 +67,12 @@ router.patch("/:id", verifyToken, async (req, res) => {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
       if (todoList.user == req.user._id) {
-        await todoList.updateOne(req.body);
-        res.status(200).json({ ...todoList.toObject(), ...req.body });
+        if (req.body.title && req.body.title.length == 0) {
+          res.status(422).json({ message: "Title cannot be empty!" });
+        } else {
+          await todoList.updateOne(req.body);
+          res.status(200).json({ ...todoList.toObject(), ...req.body });
+        }
       } else {
         res.status(403).json({ message: "Not allowed." });
       }
@@ -83,9 +91,13 @@ router.patch("/:id/todo", verifyToken, async (req, res) => {
       if (todoList.user == req.user._id) {
         const index = todoList.todos.findIndex((todo) => todo._id == req.body.todo._id);
         if (index + 1) {
-          todoList.todos[index] = req.body.todo;
-          await todoList.save();
-          res.status(200).json(todoList);
+          if (req.body.todo.text.length > 0) {
+            todoList.todos[index] = req.body.todo;
+            await todoList.save();
+            res.status(200).json(todoList);
+          } else {
+            res.status(422).json({ message: "Text cannot be empty!" });
+          }
         } else {
           res.status(404).json({ message: "Todo not found." });
         }
