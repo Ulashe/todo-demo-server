@@ -17,7 +17,7 @@ mongoose.connect(
   () => console.log("connected to db!")
 );
 
-mongoose.set("debug", true);
+mongoose.set("debug", false);
 
 app.use(morgan("dev"));
 app.use(express.json());
