@@ -5,15 +5,23 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const ac = require("../helpers/accessControl");
 
-const expiresInSeconds = 60 * 2;
+const expiresInSeconds = 60 * 3;
 
 const errors = [
   { code: 0, field: "email", reason: "Email is invalid." },
   { code: 1, field: "email", reason: "Email already exists." },
   { code: 2, field: "email", reason: "Email not found." },
-  { code: 3, field: "password", reason: "Password is invalid, must be at least 6 digits." },
+  {
+    code: 3,
+    field: "password",
+    reason: "Password is invalid, must be at least 6 digits.",
+  },
   { code: 4, field: "password", reason: "Password is wrong." },
-  { code: 5, field: "newPassword", reason: "New password is invalid, must be at least 6 digits." },
+  {
+    code: 5,
+    field: "newPassword",
+    reason: "New password is invalid, must be at least 6 digits.",
+  },
 ];
 
 // Sign Up
@@ -23,14 +31,16 @@ router.post("/signup", async (req, res) => {
     const emailRegex = new RegExp(
       /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
     );
-    if (!emailRegex.test(req.body.email)) return res.status(422).json({ errors, error: errors[0] });
+    if (!emailRegex.test(req.body.email))
+      return res.status(422).json({ errors, error: errors[0] });
 
     // Check if the user is already in the database
     const emailExist = await User.findOne({ email: req.body.email });
     if (emailExist) return res.status(422).json({ errors, error: errors[1] });
 
     // Check if the password is at least 6 characters
-    if (req.body.password.length < 6) return res.status(422).json({ errors, error: errors[3] });
+    if (req.body.password.length < 6)
+      return res.status(422).json({ errors, error: errors[3] });
 
     // Hash passwords
     const salt = await bcrypt.genSalt();
@@ -74,18 +84,21 @@ router.post("/signin", async (req, res) => {
     const emailRegex = new RegExp(
       /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
     );
-    if (!emailRegex.test(req.body.email)) return res.status(422).json({ errors, error: errors[0] });
+    if (!emailRegex.test(req.body.email))
+      return res.status(422).json({ errors, error: errors[0] });
 
     // Check if the email exists
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(422).json({ errors, error: errors[2] });
 
     // Check if the password is at least 6 characters
-    if (req.body.password.length < 6) return res.status(422).json({ errors, error: errors[3] });
+    if (req.body.password.length < 6)
+      return res.status(422).json({ errors, error: errors[3] });
 
     // Check if the password is correct
     const validPasword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPasword) return res.status(422).json({ errors, error: errors[4] });
+    if (!validPasword)
+      return res.status(422).json({ errors, error: errors[4] });
 
     const jwtPayload = { _id: user._id, email: user.email };
 
@@ -151,18 +164,24 @@ router.post("/changepassword", ac.verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    if (req.body.password.length < 6) return res.status(422).json({ errors, error: errors[3] });
-    if (req.body.newPassword.length < 6) return res.status(422).json({ errors, error: errors[5] });
+    if (req.body.password.length < 6)
+      return res.status(422).json({ errors, error: errors[3] });
+    if (req.body.newPassword.length < 6)
+      return res.status(422).json({ errors, error: errors[5] });
 
     const validPasword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPasword) return res.status(422).json({ errors, error: errors[4] });
+    if (!validPasword)
+      return res.status(422).json({ errors, error: errors[4] });
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
     user.password = hashedPassword;
     await user.save();
 
-    await RefreshToken.deleteMany({ user: user._id, _id: { $ne: req.body.refreshToken } });
+    await RefreshToken.deleteMany({
+      user: user._id,
+      _id: { $ne: req.body.refreshToken },
+    });
 
     res.status(200).json({
       message:

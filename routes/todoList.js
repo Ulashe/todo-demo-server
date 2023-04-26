@@ -89,7 +89,9 @@ router.patch("/:id/todo", verifyToken, async (req, res) => {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
       if (todoList.user == req.user._id) {
-        const index = todoList.todos.findIndex((todo) => todo._id == req.body.todo._id);
+        const index = todoList.todos.findIndex(
+          (todo) => todo._id == req.body.todo._id
+        );
         if (index + 1) {
           if (req.body.todo.text.length > 0) {
             todoList.todos[index] = req.body.todo;
@@ -135,7 +137,9 @@ router.delete("/:id/todo", verifyToken, async (req, res) => {
     const todoList = await TodoList.findById(req.params.id);
     if (todoList) {
       if (todoList.user == req.user._id) {
-        todoList.todos = todoList.todos.filter((todo) => todo._id != req.body.todo._id);
+        todoList.todos = todoList.todos.filter(
+          (todo) => todo._id != req.body.todo._id
+        );
         await todoList.save();
         res.status(200).json(todoList);
       } else {
